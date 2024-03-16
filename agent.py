@@ -64,7 +64,7 @@ def get_meeting_transcript(meeting_id: str) -> str:
 
     print("Transcript:", response.text)
 
-    with open('good_sales_call.txt','r') as file:
+    with open('bad_sales_call.txt','r') as file:
         call_transcript = file.read()
 
     return call_transcript
