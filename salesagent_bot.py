@@ -40,9 +40,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = agent.chat("Create onchain sales job.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
 
-
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Fetching LinkedIn profile of the event participant... 🕵️‍♂️")
+    
     response = agent.chat("Prepare a memo how to prepare for this private jet services sales call using info about the event participant from their LinkedIn profile. Score this lead's success probability from 1 to 10 based on the LinkedIn profile information and the upcoming sales call event details. List possible topics or questions to discuss/ask to make the sales call successful. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transferring USDC to the LinkedIn Agent for LinkedIn profile fetch... 💸")
+    transaction_hash = create_transfer("0.1", "0xeb6e084738dff0739655a99df0de4f37ce979a71", "f1c83e00-19b9-5feb-adfe-0e3de5ebaf29")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transfer complete, transaction ID: "+transaction_hash+" 🎉")
+
 
     #sleep for 10 seconds
     await context.bot.send_message(chat_id=update.effective_chat.id, text="😴")
@@ -66,8 +72,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = agent.chat("Complete the onchain sales job with the sales call performance score. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
     
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transferring USDC to the AI agent for the successful completion of the sales call... 💸")
-    transaction_hash = create_transfer("1", "0xd1c31e2c6c5558c306c9c71d51e1faffd80ef517", "0b28bb7d-7584-5585-ad56-12a3c814d427")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transferring USDC to the AI sales agent for the successful evaluation of the sales call... 💸")
+    transaction_hash = create_transfer("0.5", "0xd1c31e2c6c5558c306c9c71d51e1faffd80ef517", "0b28bb7d-7584-5585-ad56-12a3c814d427")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Transfer complete, transaction ID: "+transaction_hash+" 🎉")
 
     response = agent.chat("Update the CRM with the sales call score and topics discussed. Format the response for Telegram message, use emoji.")
