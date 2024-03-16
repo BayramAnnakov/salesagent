@@ -34,4 +34,4 @@ def create_transfer(amount: str, destination_address: str, wallet_id: str) -> No
 
     print(response.text)
 
-create_transfer("1", "0xd1c31e2c6c5558c306c9c71d51e1faffd80ef517", "0b28bb7d-7584-5585-ad56-12a3c814d427")
+    return response.json().get('data').get('id')

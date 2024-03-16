@@ -1,11 +1,17 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
 
 import os
 
-alchemy_key = os.environ['ALCHEMY_API_KEY']
+#alchemy_key = os.environ['ALCHEMY_API_KEY']
+alchemy_key = os.environ['ALCHEMY_API_KEY_ARB']
 
-w3 = Web3(Web3.HTTPProvider(f'https://base-sepolia.g.alchemy.com/v2/{alchemy_key}'))
+#w3 = Web3(Web3.HTTPProvider(f'https://base-sepolia.g.alchemy.com/v2/{alchemy_key}'))
+w3 = Web3(Web3.HTTPProvider(f'https://arb-sepolia.g.alchemy.com/v2/{alchemy_key}'))
 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 assert w3.is_connected()
@@ -250,7 +256,8 @@ contract_abi = """[
 	}
 ]"""
 
-contract = w3.eth.contract(abi=contract_abi, address="0xD24315294aFC0d5eBe11F4702637682176E6540F")
+#contract = w3.eth.contract(abi=contract_abi, address="0xD24315294aFC0d5eBe11F4702637682176E6540F")
+contract = w3.eth.contract(abi=contract_abi, address="0xDAA3624F4aD873292dc2349B4EF0BA66F62c0f4d")
 
 owner_account = w3.eth.account.from_key(os.environ['MY_PRIVATE_KEY'])
 

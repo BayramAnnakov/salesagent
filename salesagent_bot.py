@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 import logging
 from telegram import Update
 from telegram.ext import filters
@@ -11,6 +16,10 @@ from llama_index.agent.openai import OpenAIAgent
 from agent import get_openai_agent
 
 from docx import Document
+
+from circle import create_transfer
+
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -39,7 +48,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="😴")
     time.sleep(10)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Detected meeting transcript")  
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Detected meeting transcript, evaluating... 🕵️‍♂️")  
 
     response = agent.chat("Analyze the sales call using meeting transcript that is downloaded by zoom meeting id. Score the sales call from 1 to 10. Format response for Telegram message, use emoji")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
@@ -56,6 +65,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response = agent.chat("Complete the onchain sales job with the sales call performance score. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
+    
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transferring USDC to the AI agent for the successful completion of the sales call... 💸")
+    transaction_hash = create_transfer("1", "0xd1c31e2c6c5558c306c9c71d51e1faffd80ef517", "0b28bb7d-7584-5585-ad56-12a3c814d427")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Transfer complete, transaction ID: "+transaction_hash+" 🎉")
 
     response = agent.chat("Update the CRM with the sales call score and topics discussed. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
