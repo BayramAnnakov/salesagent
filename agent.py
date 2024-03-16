@@ -11,11 +11,6 @@ from typing import Dict, Any
 
 from utils import get_zoom_token
 
-with open('bayram_linkedin_profile.txt','r') as file:
-    profile = file.read()
-
-
-zoom_token = get_zoom_token()
 
 def search_linkedin(firstName: str, lastName: str, companyName: str) -> str:
     """Searches LinkedIn profile for person's first and last name, company name and returns the profile information"""
@@ -37,14 +32,11 @@ def search_linkedin(firstName: str, lastName: str, companyName: str) -> str:
     
     return response.json().get('profile')
 
-linkedin_tool = FunctionTool.from_defaults(fn=search_linkedin)
-
-with open('bad_sales_call.txt','r') as file:
-    call_transcript = file.read()
-
 def get_meeting_transcript(meeting_id: str) -> str:
     """Gets the transcript of a meeting with a given Zoom meeting ID"""
     print(f"Getting transcript for meeting {meeting_id}")
+
+    zoom_token = get_zoom_token()
 
     meeting_id = "84625563686"
 
@@ -66,10 +58,13 @@ def get_meeting_transcript(meeting_id: str) -> str:
 
     print("Transcript:", response.text)
 
+    with open('bad_sales_call.txt','r') as file:
+        call_transcript = file.read()
+
     return call_transcript
 
 
-meeting_transcript_tool = FunctionTool.from_defaults(fn=get_meeting_transcript)
+
 
 
 def update_crm(customer_id: str, customer_full_name: str, customer_company:str, sales_call_score: int, lead_score: int, topics: str) -> str:
@@ -84,24 +79,19 @@ def update_crm(customer_id: str, customer_full_name: str, customer_company:str, 
 
     return f"Updated the CRM for customer {customer_id} with sales call score {sales_call_score}, lead success probability {lead_score}"
 
-crm_update_tool = FunctionTool.from_defaults(fn=update_crm)
 
-gcal_tools = GoogleCalendarToolSpec().to_tool_list()
+def get_openai_agent() -> OpenAIAgent:
 
-llm = OpenAI(model="gpt-4-0125-preview")
+    linkedin_tool = FunctionTool.from_defaults(fn=search_linkedin)
 
-agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=False, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
+    meeting_transcript_tool = FunctionTool.from_defaults(fn=get_meeting_transcript)
 
-response = agent.chat("Search the upcoming sales calendar events on March 17th 2024.")
-print(str(response))
+    crm_update_tool = FunctionTool.from_defaults(fn=update_crm)
 
-response = agent.chat("Prepare a memo how to prepare for this private jet services sales call using info about the event participant from their LinkedIn profile. Score this lead's success probability from 1 to 10 based on the LinkedIn profile information and the upcoming sales call event details. List possible topics or questions to discuss/ask to make the sales call successful. ")
-print(str(response))
+    gcal_tools = GoogleCalendarToolSpec().to_tool_list()
 
-response = agent.chat("Analyze the sales call using meeting transcript that is downloaded by zoom meeting id. Score the sales call from 1 to 10.")
+    llm = OpenAI(model="gpt-4-0125-preview")
 
-print(str(response))
+    agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=False, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
 
-response = agent.chat("Update the CRM with the sales call score")
-
-print(str(response))
+    return agent
