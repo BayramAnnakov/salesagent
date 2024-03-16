@@ -4,6 +4,7 @@ from telegram.ext import filters
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
 
 import os
+import time
 
 from llama_index.agent.openai import OpenAIAgent
 
@@ -33,6 +34,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response = agent.chat("Prepare a memo how to prepare for this private jet services sales call using info about the event participant from their LinkedIn profile. Score this lead's success probability from 1 to 10 based on the LinkedIn profile information and the upcoming sales call event details. List possible topics or questions to discuss/ask to make the sales call successful. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
+
+    #sleep for 10 seconds
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="😴")
+    time.sleep(10)
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Detected meeting transcript")  
 
     response = agent.chat("Analyze the sales call using meeting transcript that is downloaded by zoom meeting id. Score the sales call from 1 to 10. Format response for Telegram message, use emoji")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
