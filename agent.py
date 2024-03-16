@@ -17,9 +17,6 @@ with open('bayram_linkedin_profile.txt','r') as file:
 
 zoom_token = get_zoom_token()
 
-print(zoom_token)
-
-
 def search_linkedin(firstName: str, lastName: str, companyName: str) -> str:
     """Searches LinkedIn profile for person's first and last name, company name and returns the profile information"""
     print(f"Searching LinkedIn for {firstName} {lastName} from {companyName}")
@@ -93,7 +90,7 @@ gcal_tools = GoogleCalendarToolSpec().to_tool_list()
 
 llm = OpenAI(model="gpt-4-0125-preview")
 
-agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=True, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
+agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=False, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
 
 response = agent.chat("Search the upcoming sales calendar events on March 17th 2024.")
 print(str(response))
