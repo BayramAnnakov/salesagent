@@ -1,6 +1,7 @@
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import filters
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
 
 import os
 
@@ -18,7 +19,12 @@ logging.basicConfig(
 agent = get_openai_agent()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Checking the upcoming sales calendar events on March 17th 2024... 📅")
+    sticker_message = await context.bot.send_message(chat_id=update.effective_chat.id, text="🤖")
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+
     response = agent.chat("Search the upcoming sales calendar events on March 17th 2024. Format the response for Telegram message, use emoji.")
+    await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=sticker_message.message_id)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
 
     response = agent.chat("Create onchain sales job.")
@@ -49,7 +55,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(os.environ["TELEGRAM_BOT_TOKEN"]).build()
-    
+
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
     
