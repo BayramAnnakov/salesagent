@@ -1,7 +1,11 @@
 import os
 import requests
+import requests_cache
 
 from typing import Dict, Any
+
+requests_cache.install_cache('api_cache', expire_after=3600)
+
 
 def get_zoom_token() -> Dict[str, Any]:
     """Gets the Zoom API token"""

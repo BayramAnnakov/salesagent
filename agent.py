@@ -4,6 +4,7 @@ from llama_index.core.tools import FunctionTool
 from llama_index.tools.google import GoogleCalendarToolSpec
 
 import requests
+import requests_cache
 import os
 import csv
 
@@ -11,6 +12,9 @@ from typing import Dict, Any
 
 from utils import get_zoom_token
 from crm import insert_or_update_customer
+
+requests_cache.install_cache('api_cache', expire_after=3600)
+
 
 
 def search_linkedin(firstName: str, lastName: str, companyName: str) -> str:
