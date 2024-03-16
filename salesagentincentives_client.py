@@ -292,15 +292,15 @@ def create_job() -> int:
 
 
 
-def complete_job(job_id):
+def complete_job(job_id, performance_score) -> dict:
     complete_job_tx = contract.functions.completeJob(
-        job_id, 90
+        job_id, performance_score
     ).build_transaction({
-    'from': owner_account.address,
-    'nonce': w3.eth.get_transaction_count(owner_account.address),
-    'gas': 200000,
-    'gasPrice': w3.to_wei('50', 'gwei')
-})
+        'from': owner_account.address,
+        'nonce': w3.eth.get_transaction_count(owner_account.address),
+        'gas': 200000,
+        'gasPrice': w3.to_wei('50', 'gwei')
+    })
 
 
     # Sign the transaction
@@ -312,11 +312,11 @@ def complete_job(job_id):
     # Wait for the transaction to be mined
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
-    print(tx_receipt)
+    print (f"Job {job_id} completed successfully, transaction hash: {tx_hash.hex()}")
 
     return tx_receipt
 
-def release_payment(job_id):
+def release_payment(job_id) -> dict:
     release_payment_tx = contract.functions.releasePayment(
         job_id
     ).build_transaction({
@@ -334,11 +334,10 @@ def release_payment(job_id):
     # Wait for the transaction to be mined
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
-
+    print(f"Payment for job {job_id} released successfully, transaction hash: {tx_hash.hex()}")
     return tx_receipt
 
-
-def fund_job(job_id):
+def fund_job(job_id) -> dict:
     fund_job_tx = contract.functions.fundJob(
         job_id
     ).build_transaction({
@@ -360,11 +359,13 @@ def fund_job(job_id):
 
     print(f"Job {job_id} funded successfully, transaction hash: {tx_hash.hex()}")
 
+    return tx_receipt
+
 job_id = create_job()
 
 fund_job(job_id)
 
-complete_job(job_id)
+complete_job(job_id, 90)
 
 release_payment(job_id)
 
