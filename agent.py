@@ -5,6 +5,7 @@ from llama_index.tools.google import GoogleCalendarToolSpec
 
 import requests
 import os
+import csv
 
 from typing import Dict, Any
 
@@ -70,13 +71,29 @@ def get_meeting_transcript(meeting_id: str) -> str:
 
     return call_transcript
 
+
 meeting_transcript_tool = FunctionTool.from_defaults(fn=get_meeting_transcript)
+
+
+def update_crm(customer_id: str, customer_full_name: str, customer_company:str, sales_call_score: int, lead_score: int, topics: str) -> str:
+    """Updates the CRM with the sales call score and lead score"""
+    print(f"Updating CRM for customer {customer_id} with sales call score {sales_call_score}, lead success probability {lead_score}")
+
+    data = [customer_id, customer_full_name, customer_company, sales_call_score, lead_score]
+
+    with open('crm.csv', 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
+
+    return f"Updated the CRM for customer {customer_id} with sales call score {sales_call_score}, lead success probability {lead_score}"
+
+crm_update_tool = FunctionTool.from_defaults(fn=update_crm)
 
 gcal_tools = GoogleCalendarToolSpec().to_tool_list()
 
 llm = OpenAI(model="gpt-4-0125-preview")
 
-agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0]], llm=llm, verbose=True, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
+agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=True, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
 
 response = agent.chat("Search the upcoming sales calendar events on March 17th 2024.")
 print(str(response))
@@ -85,5 +102,9 @@ response = agent.chat("Prepare a memo how to prepare for this private jet servic
 print(str(response))
 
 response = agent.chat("Analyze the sales call using meeting transcript that is downloaded by zoom meeting id. Score the sales call from 1 to 10.")
+
+print(str(response))
+
+response = agent.chat("Update the CRM with the sales call score")
 
 print(str(response))
