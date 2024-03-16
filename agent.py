@@ -12,6 +12,7 @@ from typing import Dict, Any
 
 from utils import get_zoom_token
 from crm import insert_or_update_customer
+from salesagentincentives_client import create_job, complete_job, fund_job, release_payment
 
 requests_cache.install_cache('api_cache', expire_after=3600)
 
@@ -82,6 +83,24 @@ def update_crm(customer_id: str, customer_full_name: str, customer_company:str, 
 
     return f"Updated the CRM for customer {customer_id} with sales call score {sales_call_score}, lead success probability {lead_score}"
 
+def create_onchain_sales_job() -> str:
+    """Creates a job on the blockchain for the sales manager to review"""
+    print("Creating a job on the blockchain for the sales manager to review")
+    job_id = create_job()
+
+    fund_job(job_id)
+    
+    return "Created a job with ID {job_id} on the blockchain for the sales manager to review"
+
+def complete_onchain_sales_job(job_id: int, sales_performance_score: int) -> str:
+    """Completes the job on the blockchain with the performance score. Pays bonus if performance score is above the threshold."""
+    print(f"Completing job {job_id} on the blockchain")
+
+    complete_job(job_id, sales_performance_score*10)
+
+    release_payment(job_id)
+
+    return f"Completed job {job_id} on the blockchain with performance scoclere {sales_performance_score}"
 
 def get_openai_agent() -> OpenAIAgent:
 
@@ -93,8 +112,12 @@ def get_openai_agent() -> OpenAIAgent:
 
     gcal_tools = GoogleCalendarToolSpec().to_tool_list()
 
+    create_onchain_sales_job_tool = FunctionTool.from_defaults(fn=create_onchain_sales_job)
+
+    complete_onchain_sales_job_tool = FunctionTool.from_defaults(fn=complete_onchain_sales_job)
+
     llm = OpenAI(model="gpt-4-0125-preview")
 
-    agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool], llm=llm, verbose=True, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
+    agent = OpenAIAgent.from_tools([linkedin_tool, meeting_transcript_tool, gcal_tools[0], crm_update_tool, create_onchain_sales_job_tool, complete_onchain_sales_job_tool], llm=llm, verbose=True, system_prompt="You are sales coach for a company that offers private jet services. You help sales managers to prepare for meetings, analyze their sales calls and provide feedback.")
 
     return agent

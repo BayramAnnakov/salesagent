@@ -361,11 +361,11 @@ def fund_job(job_id) -> dict:
 
     return tx_receipt
 
-job_id = create_job()
+# job_id = create_job()
 
-fund_job(job_id)
+# fund_job(job_id)
 
-complete_job(job_id, 90)
+# complete_job(job_id, 90)
 
-release_payment(job_id)
+# release_payment(job_id)
 
