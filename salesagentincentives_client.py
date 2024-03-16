@@ -254,47 +254,48 @@ contract = w3.eth.contract(abi=contract_abi, address="0xD24315294aFC0d5eBe11F470
 
 owner_account = w3.eth.account.from_key(os.environ['MY_PRIVATE_KEY'])
 
-print(owner_account.address)
-
-balance = contract.functions.getContractBalance().call()
-
-print(balance)
-
 payment_amount = w3.to_wei(0.00000001, 'ether')  # Example payment amount
 bonus_amount = w3.to_wei(0.00000004, 'ether')  # Example bonus amount
 bonus_threshold = 80  # Example bonus threshold
 
-create_job_tx = contract.functions.createJob(
-    "0xAA64A7Db2C3951375dCDF8DB76ADb46C258840E7", payment_amount, bonus_amount, bonus_threshold
-).build_transaction({
-    'from': owner_account.address,
-    'nonce': w3.eth.get_transaction_count(owner_account.address),
-    'gas': 300000,
-    'gasPrice': w3.to_wei('50', 'gwei')
-})
+def create_job() -> int:
+   
 
-# Sign the transaction
-signed_tx = owner_account.sign_transaction(create_job_tx)
+    create_job_tx = contract.functions.createJob(
+        "0xAA64A7Db2C3951375dCDF8DB76ADb46C258840E7", payment_amount, bonus_amount, bonus_threshold
+    ).build_transaction({
+        'from': owner_account.address,
+        'nonce': w3.eth.get_transaction_count(owner_account.address),
+        'gas': 200000,
+        'gasPrice': w3.to_wei('50', 'gwei')
+    })
 
-# Send the transaction
-tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    # Sign the transaction
+    signed_tx = owner_account.sign_transaction(create_job_tx)
 
-# Wait for the transaction to be mined
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    # Send the transaction
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
 
-print(tx_receipt)
+    # Wait for the transaction to be mined
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
-job_created_events = contract.events.JobCreated().process_receipt(tx_receipt)
-job_id = job_created_events[0]['args']['jobId'] if job_created_events else None
+    print(tx_receipt)
 
-if job_id is not None:
-    print(f"Job created successfully with Job ID: {job_id}")
-else:
-    print("Job creation failed or JobCreated event not found.")
+    job_created_events = contract.events.JobCreated().process_receipt(tx_receipt)
+    job_id = job_created_events[0]['args']['jobId'] if job_created_events else None
 
-complete_job_tx = contract.functions.completeJob(
-    job_id, 90
-).build_transaction({
+    if job_id is not None:
+        print(f"Job created successfully with Job ID: {job_id}")
+    else:
+        print("Job creation failed or JobCreated event not found.")
+    return job_id
+
+
+
+def complete_job(job_id):
+    complete_job_tx = contract.functions.completeJob(
+        job_id, 90
+    ).build_transaction({
     'from': owner_account.address,
     'nonce': w3.eth.get_transaction_count(owner_account.address),
     'gas': 200000,
@@ -302,13 +303,46 @@ complete_job_tx = contract.functions.completeJob(
 })
 
 
-# Sign the transaction
-signed_tx = owner_account.sign_transaction(complete_job_tx)
+    # Sign the transaction
+    signed_tx = owner_account.sign_transaction(complete_job_tx)
 
-# Send the transaction
-tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    # Send the transaction
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
 
-# Wait for the transaction to be mined
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    # Wait for the transaction to be mined
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
-print(tx_receipt)
+    print(tx_receipt)
+
+    return tx_receipt
+
+
+
+def fund_job(job_id):
+    fund_job_tx = contract.functions.fundJob(
+        job_id
+    ).build_transaction({
+        'from': owner_account.address,
+        'nonce': w3.eth.get_transaction_count(owner_account.address),
+        'value': payment_amount + bonus_amount,  # This is where you specify the Ether amount to send
+        'gas': 200000,
+        'gasPrice': w3.to_wei('50', 'gwei')
+    })
+
+    # Sign the transaction
+    signed_tx = owner_account.sign_transaction(fund_job_tx)
+
+    # Send the transaction
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+    # Wait for the transaction to be mined
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    print(f"Job {job_id} funded successfully, transaction hash: {tx_hash.hex()}")
+
+job_id = create_job()
+
+fund_job(job_id)
+
+complete_job(job_id)
+
