@@ -269,7 +269,7 @@ create_job_tx = contract.functions.createJob(
 ).build_transaction({
     'from': owner_account.address,
     'nonce': w3.eth.get_transaction_count(owner_account.address),
-    'gas': 200000,
+    'gas': 300000,
     'gasPrice': w3.to_wei('50', 'gwei')
 })
 
@@ -292,3 +292,23 @@ if job_id is not None:
 else:
     print("Job creation failed or JobCreated event not found.")
 
+complete_job_tx = contract.functions.completeJob(
+    job_id, 90
+).build_transaction({
+    'from': owner_account.address,
+    'nonce': w3.eth.get_transaction_count(owner_account.address),
+    'gas': 200000,
+    'gasPrice': w3.to_wei('50', 'gwei')
+})
+
+
+# Sign the transaction
+signed_tx = owner_account.sign_transaction(complete_job_tx)
+
+# Send the transaction
+tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+# Wait for the transaction to be mined
+tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+print(tx_receipt)
