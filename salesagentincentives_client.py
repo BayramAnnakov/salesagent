@@ -316,6 +316,26 @@ def complete_job(job_id):
 
     return tx_receipt
 
+def release_payment(job_id):
+    release_payment_tx = contract.functions.releasePayment(
+        job_id
+    ).build_transaction({
+        'from': owner_account.address,
+        'nonce': w3.eth.get_transaction_count(owner_account.address),
+        'gas': 200000,
+        'gasPrice': w3.to_wei('50', 'gwei')
+    })
+
+    signed_tx = owner_account.sign_transaction(release_payment_tx)
+
+    # Send the transaction
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+    # Wait for the transaction to be mined
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+
+    return tx_receipt
 
 
 def fund_job(job_id):
@@ -345,4 +365,6 @@ job_id = create_job()
 fund_job(job_id)
 
 complete_job(job_id)
+
+release_payment(job_id)
 
