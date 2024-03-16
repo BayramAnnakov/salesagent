@@ -40,7 +40,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = agent.chat("Create onchain sales job.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Fetching LinkedIn profile of the event participant... 🕵️‍♂️")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Fetching LinkedIn profile of the event participant and preparing memo... 🕵️‍♂️")
     
     response = agent.chat("Prepare a memo how to prepare for this private jet services sales call using info about the event participant from their LinkedIn profile. Score this lead's success probability from 1 to 10 based on the LinkedIn profile information and the upcoming sales call event details. List possible topics or questions to discuss/ask to make the sales call successful. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
