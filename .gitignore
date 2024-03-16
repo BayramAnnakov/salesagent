@@ -8,3 +8,4 @@ crm.csv
 *.pyc
 meeting_analysis.docx
 crm.db
+api_cache.sqlite

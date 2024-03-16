@@ -37,7 +37,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with open('meeting_analysis.docx', 'rb') as file:
         await context.bot.send_document(chat_id=update.effective_chat.id, document=file, caption="📋 I've analyzed the sales call. Here's the meeting analysis document.")
 
-    response = agent.chat("Update the CRM with the sales call score. Format the response for Telegram message, use emoji.")
+    response = agent.chat("Update the CRM with the sales call score and topics discussed. Format the response for Telegram message, use emoji.")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=str(response), parse_mode="Markdown")
 
 if __name__ == '__main__':
