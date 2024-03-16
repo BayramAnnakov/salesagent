@@ -256,7 +256,7 @@ owner_account = w3.eth.account.from_key(os.environ['MY_PRIVATE_KEY'])
 
 payment_amount = w3.to_wei(0.00000001, 'ether')  # Example payment amount
 bonus_amount = w3.to_wei(0.00000004, 'ether')  # Example bonus amount
-bonus_threshold = 80  # Example bonus threshold
+bonus_threshold = 70  # Example bonus threshold
 
 def create_job() -> int:
    

@@ -64,7 +64,7 @@ def get_meeting_transcript(meeting_id: str) -> str:
 
     print("Transcript:", response.text)
 
-    with open('bad_sales_call.txt','r') as file:
+    with open('good_sales_call.txt','r') as file:
         call_transcript = file.read()
 
     return call_transcript
@@ -90,17 +90,20 @@ def create_onchain_sales_job() -> str:
 
     fund_job(job_id)
     
-    return "Created a job with ID {job_id} on the blockchain for the sales manager to review"
+    return f"Created a job with ID {job_id} on the blockchain for the sales manager to review"
 
 def complete_onchain_sales_job(job_id: int, sales_performance_score: int) -> str:
-    """Completes the job on the blockchain with the performance score. Pays bonus if performance score is above the threshold."""
+    """Completes the job on the blockchain with the performance score. Pays bonus if performance score is above the threshold and congratulates the sales manager."""
     print(f"Completing job {job_id} on the blockchain")
 
     complete_job(job_id, sales_performance_score*10)
 
     release_payment(job_id)
 
-    return f"Completed job {job_id} on the blockchain with performance scoclere {sales_performance_score}"
+    if sales_performance_score > 7:
+        return f"Completed job {job_id} on the blockchain with performance score {sales_performance_score}. Bonus paid to the sales manager."
+    else:
+        return f"Completed job {job_id} on the blockchain with performance score {sales_performance_score}. No bonus paid to the sales manager."
 
 def get_openai_agent() -> OpenAIAgent:
 
