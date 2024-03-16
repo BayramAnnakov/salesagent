@@ -7,3 +7,4 @@ __pycache__/utils.cpython-311.pyc
 crm.csv
 *.pyc
 meeting_analysis.docx
+crm.db

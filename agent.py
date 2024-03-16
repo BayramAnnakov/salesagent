@@ -10,6 +10,7 @@ import csv
 from typing import Dict, Any
 
 from utils import get_zoom_token
+from crm import insert_or_update_customer
 
 
 def search_linkedin(firstName: str, lastName: str, companyName: str) -> str:
@@ -73,9 +74,7 @@ def update_crm(customer_id: str, customer_full_name: str, customer_company:str, 
 
     data = [customer_id, customer_full_name, customer_company, sales_call_score, lead_score]
 
-    with open('crm.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(data)
+    insert_or_update_customer(*data)
 
     return f"Updated the CRM for customer {customer_id} with sales call score {sales_call_score}, lead success probability {lead_score}"
 
